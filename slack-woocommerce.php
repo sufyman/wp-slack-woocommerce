@@ -34,23 +34,23 @@
  *
  * @filter slack_get_events
  */
-function wp_slack_woocommerce_order_status_completed( $events ) {
-	$events['woocommerce_order_status_completed'] = array(
+function wp_slack_woocommerce_order_status_processing( $events ) {
+	$events['woocommerce_order_status_processing'] = array(
 
 		// Action in WooCommerce to hook in to get the message.
-		'action' => 'woocommerce_order_status_completed',
+		'action' => 'woocommerce_order_status_processing',
 
 		// Description appears in integration setting.
-		'description' => __( 'When a payment in WooCommerce is marked as complete', 'slack-woocommerce' ),
+		'description' => __( 'When a payment in WooCommerce is marked as processing', 'slack-woocommerce' ),
 
 		// Message to deliver to channel. Returns false will prevent
 		// notification delivery.
 		'message' => function( $order_id ) {
 			$order = wc_get_order( $order_id );
 
-			$date = is_callable( array( $order, 'get_date_completed' ) )
-				? $order->get_date_completed()
-				: $order->completed_date;
+			$date = is_callable( array( $order, 'get_date_processing' ) )
+				? $order->get_date_processing()
+				: $order->processing_date;
 			$url  = add_query_arg(
 				array(
 					'post'   => $order_id,
@@ -94,7 +94,7 @@ function wp_slack_woocommerce_order_status_completed( $events ) {
 			remove_filter( 'woocommerce_get_formatted_order_total', 'wp_strip_all_tags', 10 );
 
 			// Returns the message to be delivered to Slack.
-			return apply_filters( 'slack_woocommerce_order_status_completed_message',
+			return apply_filters( 'slack_woocommerce_order_status_processing_message',
 				sprintf(
 					__( 'New payment with amount *%1$s* has been made by *%2$s* on *%3$s*. <%4$s|See detail>', 'slack-woocommerce' ),
 					$total,
@@ -109,4 +109,4 @@ function wp_slack_woocommerce_order_status_completed( $events ) {
 
 	return $events;
 }
-add_filter( 'slack_get_events', 'wp_slack_woocommerce_order_status_completed' );
+add_filter( 'slack_get_events', 'wp_slack_woocommerce_order_status_processing' );
